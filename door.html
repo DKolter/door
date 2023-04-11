@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        html,
+        body {
+            height: 100%%;
+        }
+
+        body {
+            background-image: url('https://4kwallpapers.com/images/wallpapers/computer-chip-cpu-2048x1536-9406.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            overflow: hidden;
+            font-family: Courier New;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .state {
+            text-align: center;
+            color: black;
+            font-size: 25px;
+            position: absolute;
+            left: 50%%;
+            top: 50%%;
+        }
+
+        .log {
+            position: absolute;
+            left: 50%%;
+            top: 50%%;
+            transform: translate(-50%%, -50%%);
+            width: 250px;
+            height: 250px;
+            background-color: black;
+            border-radius: 23px;
+            color: white;
+            box-sizing: border-box;
+            padding: 20px;
+            font-size: 12px;
+            overflow-y: scroll;
+            overflow-x: visible;
+            overflow-wrap: anywhere;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .log-time {
+            color: #8884FF;
+        }
+
+        .log-error {
+            color: #FF5D73;
+        }
+
+        .log-info {
+            color: palegreen;
+        }
+
+        .lock {
+            width: 64px;
+            height: 64px;
+            margin: 10px;
+        }
+
+        .forms {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%%;
+            margin-top: 5px;
+            gap: 20px;
+        }
+
+        #lower-forms {
+            margin-bottom: 20px;
+        }
+
+        button,
+        .info {
+            background-color: #8884FF;
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .restart-col {
+            width: 100%%;
+            text-align: center;
+        }
+
+        .restart-btn {
+            background-color: #FF5D73;
+            height: 45px;
+        }
+
+        .info {
+            display: flex;
+            gap: 5px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            image-rendering: crisp-edges;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .since {
+            font-size: 10px;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            updateSize();
+            initLastState();
+            updateOnChange();
+        }
+
+        function updateSize() {
+            var imgRatio = 0.75;
+            var screenRatio = document.body.clientHeight / document.body.clientWidth;
+            if (screenRatio > imgRatio) {
+                var scale = 2.0 * document.body.clientHeight / 1536.0;
+            } else {
+                var scale = 2.0 * document.body.clientWidth / 2048.0;
+            }
+            var state = document.getElementsByClassName("state")[0];
+            var log = document.getElementsByClassName("log")[0];
+            state.style.transform = "translate(-50%%, -50%%) scale(" + scale + ")";
+            if (log) {
+                log.style.transform = "translate(-50%%, -50%%) scale(" + scale + ")";
+            }
+        }
+
+        function sendRequest(request) {
+            const Http = new XMLHttpRequest();
+            Http.open("GET", "./" + request, true);
+            Http.send();
+        }
+
+        lastState = null;
+
+        function initLastState() {
+            const state = document.getElementsByClassName("lock")[0];
+            const is_open = state.src === "https://cdn-icons-png.flaticon.com/512/4634/4634120.png";
+            lastState = is_open ? "open" : "closed";
+        }
+
+        function updateOnChange() {
+            const Http = new XMLHttpRequest();
+            Http.onreadystatechange = () => {
+                if (Http.readyState === 4) {
+                    const changedClosed = Http.response === "closed" && lastState !== "closed";
+                    const changedOpen = Http.response === "open" && lastState !== "open";
+                    if (changedClosed || changedOpen) {
+                        window.location.reload();
+                    }
+                }
+            }
+            Http.open("GET", "./state", true);
+            Http.send();
+            setTimeout(updateOnChange, 1000);
+        }
+    </script>
+</head>
+
+<body onresize="updateSize()">
+    <div class="forms">
+        <button class="request-btn" onclick="sendRequest('opendoor')">Open door</button>
+        <button class="request-btn" onclick="sendRequest('closedoor')">Close door</button>
+    </div>
+    <div class="state">
+        <p>Current <br>state:</p>
+        <img class="lock" src="%s">
+        <p class="since">%s</p>
+    </div>
+    %s
+    <div class="forms" id="lower-forms">
+        <div class="restart-col">
+            <button class="request-btn restart-btn" onclick="sendRequest('restart')">Restart pico</button>
+        </div>
+        <div class="info">
+            <p>%s%%</p>
+            <img class="icon" src="%s">
+        </div>
+        <form action="%s">
+            <input type="image" src="https://cdn-icons-png.flaticon.com/512/462/462642.png" class="icon info"
+                value="Log">
+        </form>
+        <div class="info">
+            <p>%s</p>
+            <img class="icon" src="https://cdn-icons-png.flaticon.com/512/2944/2944675.png">
+        </div>
+    </div>
+</body>
+
+</html>

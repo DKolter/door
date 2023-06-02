@@ -3,7 +3,7 @@ This project is used to automatically open and close a door via wifi by controll
 Below you can take a look at the circuit and the website.
 
 ## Website
-![Website image](./website.png)
+![Website image](./website.jpg)
 
 ## Circuit
-![Circuit image](./circuit.png)
+![Circuit image](./circuit.jpg)

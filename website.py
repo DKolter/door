@@ -2,6 +2,7 @@ from errno import ETIMEDOUT, ECONNRESET
 import log
 import machine
 from time import sleep
+import gc
 
 
 class Website(object):
@@ -12,6 +13,8 @@ class Website(object):
     def hydrate(self, state, sensors, rtc, log_enabled):
         percentage, battery = sensors.read_battery()
         temperature = sensors.read_temperature()
+        memory = f"{int(gc.mem_alloc() / 1024)} KiB"
+        gc.collect()
         return self.template % (
             state.get_icon(),
             state.get_time(rtc),
@@ -19,7 +22,8 @@ class Website(object):
             percentage,
             battery,
             "./" if log_enabled else "./log",
-            temperature
+            temperature,
+            memory,
         )
 
     def serve(self, connection, state, display, sensors, rtc):
